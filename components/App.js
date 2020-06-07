@@ -20,15 +20,16 @@ const FILTER_NAMES = Object.keys(FILTER_MAP);
 
 export default function App(props) {
   const [tasks, setTasks] = useState(props.tasks);
-  const [filter, setFilter] = useState("All");
+  const [filter, setFilter] = useState('All');
   // counting the length of tasks and changing the text of our heading accordingly
   const tasksNoun = tasks.length !== 1 ? 'tasks' : 'task';
   const headingText = `${tasks.length} ${tasksNoun} remaining`;
+  
 
   function toggleTaskCompleted(id) {
-    // console.log(tasks[0]); test the method
+    console.log(tasks[0])
     const updatedTasks = tasks.map(task => {
-      if (id === tasks.id) {
+      if (id === task.id) {   
         return {...task, completed: !task.completed}
       }
       return task;
@@ -59,24 +60,34 @@ export default function App(props) {
   }
 
   // iterate Todo and store it at taskList
-  const taskList = tasks.map(task => (
-      <Todo
-          id={task.id}
-          name={task.name}
-          completed={task.completed}
-          key={task.id}
-          toggleTaskCompleted={toggleTaskCompleted}
-          deleteTask={deleteTask}
-          editTask={editTask}
-        />
-      )
-    );
+  const taskList = tasks
+      .filter(FILTER_MAP[filter])
+      .map(task => (
+        <Todo
+            id={task.id}
+            name={task.name}
+            completed={task.completed}
+            key={task.id}
+            toggleTaskCompleted={toggleTaskCompleted}
+            deleteTask={deleteTask}
+            editTask={editTask}
+          />
+      ));
+
+    const filterList = FILTER_NAMES.map(name => (
+      <FilterButton 
+        key={name} 
+        name={name}
+        isPressed={name == filter}
+        setFilter={setFilter}
+        />  
+  ));
 
   return (
     <div className="todoapp stack-large">
       <h1>TodoMatic</h1>
       <Form addTask={addTask}/>
-      <FilterButton />
+      {filterList}
       <h2 id="list-heading">
         {headingText}
       </h2>
